@@ -41,17 +41,24 @@ export const register = async (req, res) => {
 /* LOGGING IN */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email: email });
-    if (!user) return res.status(400).json({ msg: "User does not exist. " });
+      const { email, password } = req.body;
+      const user = await User.findOne({ email: email })
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials. " });
+      if (!user) return res.status(404).json({ msg: "User does not exist" })
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    delete user.password;
-    res.status(200).json({ token, user });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      const isMatch = await bcrypt.compare(password, user.password)
+      if (!isMatch) return res.status(400).json({ msg: "Invalide credentials. " })
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+       // COMMENT: Destructure the password and reconstruct the user object without it
+      //    const { password: _, ...userWithoutPassword } = user.toObject(); 
+      //     res.status(200).json({ token, user: userWithoutPassword }); 
+
+      const { password: pass, ...rest } = user._doc;
+      res.status(200).json({ token, user: rest })
+
+  } catch (error) {
+      res.status(500).json({ error: error.message })
   }
-};
+}
