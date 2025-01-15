@@ -31,7 +31,7 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 if (process.env.NODE_ENV === 'production') {
   app.use(cors({
-    origin: 'https://yourfrontenddomain.com',
+    origin: 'https://social-media-client-p11v2.vercel.app',
     credentials: true,
   }));
 } else {
